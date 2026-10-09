@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>AFRICA MASTER QUIZ</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Arial","Yu Gothic",sans-serif;
+}
+
+body{
+background:#f7f7f7;
+padding:10px;
+color:#333;
+}
+
+.screen{
+display:none;
+}
+
+.screen.active{
+display:block;
+}
+
+.card{
+max-width:900px;
+margin:auto;
+background:white;
+border-radius:24px;
+padding:20px;
+box-shadow:0 4px 15px rgba(0,0,0,.15);
+}
+
+h1{
+text-align:center;
+margin-bottom:10px;
+color:#ff9500;
+}
+
+.subtitle{
+text-align:center;
+margin-bottom:20px;
+color:#666;
+}
+
+.modeArea{
+margin:30px 0;
+}
+
+.modeArea label{
+display:flex;
+align-items:center;
+gap:10px;
+background:#f5f5f5;
+padding:15px;
+margin-bottom:10px;
+border-radius:12px;
+font-size:1.1rem;
+}
+
+.startBtn{
+width:100%;
+padding:18px;
+font-size:1.3rem;
+background:#ffb020;
+color:white;
+border:none;
+border-radius:16px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.startBtn:hover{
+background:#ff9800;
+}
+
+.infoBar{
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:15px;
+}
+
+.infoItem{
+background:#eef6ff;
+padding:10px 18px;
+border-radius:12px;
+font-weight:bold;
+}
+
+.questionBox{
+text-align:center;
+margin-bottom:15px;
+}
+
+.questionText{
+font-size:1.6rem;
+font-weight:bold;
+color:#444;
+}
+
+.mapContainer{
+text-align:center;
+margin-bottom:20px;
+}
+
+.mapContainer img{
+width:100%;
+max-width:700px;
+border-radius:16px;
+border:3px solid #ddd;
+}
+
+.answers{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.answerBtn{
+padding:15px;
+font-size:1rem;
+border:none;
+border-radius:14px;
+cursor:pointer;
+background:#1cb0f6;
+color:white;
+font-weight:bold;
+}
+
+.answerBtn:hover{
+transform:scale(1.03);
+}
+
+.hintBtn{
+margin-top:15px;
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:#ffd54f;
+font-weight:bold;
+cursor:pointer;
+}
+
+.feedback{
+margin-top:15px;
+text-align:center;
+font-size:1.3rem;
+font-weight:bold;
+min-height:40px;
+}
+
+.correct{
+color:#58cc02;
+}
+
+.wrong{
+color:#ff4b4b;
+}
+
+.hint{
+margin-top:10px;
+padding:15px;
+background:#fff8dd;
+border-radius:12px;
+display:none;
+}
+
+.resultBox{
+text-align:center;
+}
+
+.resultBox h2{
+color:#ff9500;
+margin-bottom:20px;
+}
+
+.resultBox p{
+font-size:1.2rem;
+margin:10px 0;
+}
+
+.mistakes{
+margin-top:20px;
+text-align:left;
+max-height:300px;
+overflow:auto;
+background:#fafafa;
+padding:15px;
+border-radius:12px;
+}
+
+.buttonRow{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.buttonRow button{
+flex:1;
+padding:15px;
+border:none;
+border-radius:12px;
+font-size:1rem;
+cursor:pointer;
+font-weight:bold;
+}
+
+.retryBtn{
+background:#58cc02;
+color:white;
+}
+
+.homeBtn{
+background:#999;
+color:white;
+}
+
+.bestRecord{
+font-size:1.3rem;
+font-weight:bold;
+color:#ff9500;
+margin-top:20px;
+}
+
+.submitGuide{
+margin-top:20px;
+padding:15px;
+background:#eef6ff;
+border-radius:12px;
+font-size:.95rem;
+}
+
+@media(max-width:600px){
+
+.questionText{
+font-size:1.2rem;
+}
+
+.answers{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- タイトル画面 -->
+
+<div id="startScreen" class="screen active">
+
+<div class="card">
+
+<h1>🌍 AFRICA MASTER QUIZ</h1>
+
+<p class="subtitle">
+アフリカの国名と自然地理を楽しくマスターしよう！
+</p>
+
+<div class="modeArea">
+
+<label>
+<input
+type="radio"
+name="mode"
+value="random"
+checked>
+
+🎲 ランダム10問チャレンジ
+</label>
+
+<label>
+<input
+type="radio"
+name="mode"
+value="all">
+
+👑 全16問マスター
+</label>
+
+</div>
+
+<button
+id="startBtn"
+class="startBtn">
+
+スタート！
+</button>
+
+</div>
+
+</div>
+
+<!-- ゲーム画面 -->
+
+<div id="gameScreen" class="screen">
+
+<div class="card">
+
+<div class="infoBar">
+
+<div class="infoItem">
+問題
+<span id="progress"></span>
+</div>
+
+<div class="infoItem">
+正解
+<span id="correctCount">0</span>
+</div>
+
+<div class="infoItem">
+時間
+<span id="timer">0</span>秒
+</div>
+
+</div>
+
+<div class="questionBox">
+
+<div
+id="questionText"
+class="questionText">
+問題
+</div>
+
+</div>
+
+<div class="mapContainer">
+
+<img
+src="africa_map.png"
+alt="アフリカ地図">
+
+</div>
+
+
+<div
+id="answers"
+class="answers">
+
+</div>
+
+<button
+id="hintBtn"
+class="hintBtn">
+
+💡 ヒント
+</button>
+
+<div
+id="hintBox"
+class="hint">
+</div>
+
+<div
+id="feedback"
+class="feedback">
+</div>
+
+</div>
+
+</div>
+
+<!-- 結果画面 -->
+
+<div id="resultScreen" class="screen">
+
+<div class="card">
+
+<div class="resultBox">
+
+<h2>🏆 RESULT</h2>
+
+<div
+id="rankBox"
+class="bestRecord">
+</div>
+
+<p>
+正解数：
+<span id="resultCorrect"></span>
+</p>
+
+<p>
+ミス数：
+<span id="resultMiss"></span>
+</p>
+
+<p>
+正答率：
+<span id="resultRate"></span>%
+</p>
+
+<p>
+タイム：
+<span id="resultTime"></span>秒
+</p>
+
+<div
+id="bestRecord"
+class="bestRecord">
+</div>
+
+<div
+id="mistakes"
+class="mistakes">
+</div>
+
+<div class="buttonRow">
+
+<button
+id="retryBtn"
+class="retryBtn">
+
+もう一回！
+</button>
+
+<button
+id="homeBtn"
+class="homeBtn">
+
+タイトルへ
+</button>
+
+</div>
+
+<div class="submitGuide">
+
+📸 スクリーンショットを撮って提出しましょう！<br>
+Windows：Ctrl + □││キー
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const quizData = [
+
+{id:"1",answer:"エジプト",hint:"ナイル川下流域の国",info:"首都：カイロ"},
+{id:"2",answer:"リビア",hint:"エジプトの西側",info:"首都：トリポリ"},
+{id:"3",answer:"アルジェリア",hint:"アフリカ最大の面積",info:"首都：アルジェ"},
+{id:"4",answer:"モロッコ",hint:"アフリカ北西端",info:"首都：ラバト"},
+{id:"5",answer:"スーダン",hint:"エジプトの南",info:"首都：ハルツーム"},
+{id:"6",answer:"エチオピア",hint:"アフリカの角付近",info:"首都：アディスアベバ"},
+{id:"7",answer:"ソマリア",hint:"アフリカ最東端付近",info:"首都：モガディシュ"},
+{id:"8",answer:"ケニア",hint:"サファリで有名",info:"首都：ナイロビ"},
+{id:"9",answer:"マダガスカル",hint:"アフリカ東の島",info:"首都：アンタナナリボ"},
+{id:"10",answer:"南アフリカ共和国",hint:"アフリカ最南部",info:"首都：プレトリア"},
+{id:"11",answer:"コンゴ民主共和国",hint:"コンゴ盆地の国",info:"首都：キンシャサ"},
+{id:"12",answer:"ナイジェリア",hint:"人口最多級",info:"首都：アブジャ"},
+{id:"A",answer:"サハラ砂漠",hint:"北アフリカの大砂漠",info:"世界最大級の砂漠"},
+{id:"B",answer:"ナイル川",hint:"エジプトを流れる",info:"世界最長級の川"},
+{id:"C",answer:"キリマンジャロ山",hint:"アフリカ最高峰",info:"タンザニア北東部"},
+{id:"D",answer:"紅海",hint:"アフリカとアラビア半島の間",info:"細長い海"}
+
+];
+
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const resultScreen = document.getElementById("resultScreen");
+
+const startBtn = document.getElementById("startBtn");
+const retryBtn = document.getElementById("retryBtn");
+const homeBtn = document.getElementById("homeBtn");
+
+const progress = document.getElementById("progress");
+const questionText = document.getElementById("questionText");
+const answers = document.getElementById("answers");
+
+const correctCountEl =
+document.getElementById("correctCount");
+
+const timerEl =
+document.getElementById("timer");
+
+const feedback =
+document.getElementById("feedback");
+
+const hintBtn =
+document.getElementById("hintBtn");
+
+const hintBox =
+document.getElementById("hintBox");
+
+let questions = [];
+let current = 0;
+let correct = 0;
+let mistakes = [];
+let seconds = 0;
+let timer;
+
+function shuffle(array){
+
+return [...array].sort(
+()=>Math.random()-0.5
+);
+
+}
+
+function startGame(){
+
+const mode =
+document.querySelector(
+'input[name="mode"]:checked'
+).value;
+
+questions =
+mode==="random"
+? shuffle(quizData).slice(0,10)
+: shuffle(quizData);
+
+current=0;
+correct=0;
+mistakes=[];
+seconds=0;
+
+correctCountEl.textContent=0;
+timerEl.textContent=0;
+
+clearInterval(timer);
+
+timer=setInterval(()=>{
+
+seconds++;
+timerEl.textContent=seconds;
+
+},1000);
+
+startScreen.classList.remove("active");
+resultScreen.classList.remove("active");
+gameScreen.classList.add("active");
+
+showQuestion();
+
+}
+
+function showQuestion(){
+
+const q=questions[current];
+
+progress.textContent=
+`${current+1}/${questions.length}`;
+
+questionText.textContent=
+`${q.id} は何でしょう？`;
+
+hintBox.style.display="none";
+hintBox.textContent="";
+
+feedback.textContent="";
+
+const choices =
+shuffle(
+quizData
+.filter(
+x=>x.answer!==q.answer
+)
+)
+.slice(0,3);
+
+choices.push(q);
+
+const finalChoices =
+shuffle(choices);
+
+answers.innerHTML="";
+
+finalChoices.forEach(choice=>{
+
+const btn=
+document.createElement("button");
+
+btn.className="answerBtn";
+
+btn.textContent=
+choice.answer;
+
+btn.onclick=()=>checkAnswer(choice);
+
+answers.appendChild(btn);
+
+});
+
+}
+
+function checkAnswer(choice){
+
+const q=questions[current];
+
+if(choice.answer===q.answer){
+
+feedback.className=
+"feedback correct";
+
+feedback.textContent=
+`✅ Correct! ${q.info}`;
+
+correct++;
+
+correctCountEl.textContent=
+correct;
+
+}else{
+
+feedback.className=
+"feedback wrong";
+
+feedback.textContent=
+`❌ Oops! 正解：${q.answer}`;
+
+mistakes.push({
+
+id:q.id,
+your:choice.answer,
+correct:q.answer
+
+});
+
+}
+
+setTimeout(()=>{
+
+current++;
+
+if(current>=questions.length){
+
+finishGame();
+
+}else{
+
+showQuestion();
+
+}
+
+},1200);
+
+}
+
+function finishGame(){
+
+    clearInterval(timer);
+
+    gameScreen.classList.remove("active");
+    resultScreen.classList.add("active");
+
+    document.getElementById("resultCorrect").textContent = correct;
+
+    document.getElementById("resultMiss").textContent =
+        questions.length - correct;
+
+    document.getElementById("resultTime").textContent =
+        seconds;
+
+    const rate = Math.round(
+        correct / questions.length * 100
+    );
+
+    document.getElementById("resultRate").textContent =
+        rate;
+
+    let rank = "";
+
+    if(rate === 100){
+        rank = "🏆 Sランク";
+    }else if(rate >= 90){
+        rank = "🥇 Aランク";
+    }else if(rate >= 80){
+        rank = "🥈 Bランク";
+    }else if(rate >= 70){
+        rank = "🥉 Cランク";
+    }else{
+        rank = "⭐ がんばろう";
+    }
+
+    document.getElementById("rankBox").innerHTML = rank;
+
+    console.log(rank);
+
+    // 自己ベスト記録
+    let bestHtml = "";
+
+    if(correct === questions.length){
+
+        const best =
+            localStorage.getItem("africa_best");
+
+        if(best === null || seconds < Number(best)){
+
+            localStorage.setItem(
+                "africa_best",
+                seconds
+            );
+
+            bestHtml =
+                `🏆 NEW RECORD!<br>自己ベスト：${seconds}秒`;
+
+        }else{
+
+            bestHtml =
+                `⭐ 自己ベスト：${best}秒`;
+
+        }
+    }
+
+    document.getElementById(
+        "bestRecord"
+    ).innerHTML = bestHtml;
+
+    // 間違い一覧
+    const missArea =
+        document.getElementById("mistakes");
+
+    if(mistakes.length === 0){
+
+        missArea.innerHTML =
+            "<b>🎉 全問正解！</b>";
+
+    }else{
+
+        missArea.innerHTML =
+            "<h3>間違えた問題</h3>";
+
+        mistakes.forEach(m => {
+
+            missArea.innerHTML += `
+                <hr>
+                <b>${m.id}</b><br>
+                あなた：${m.your}<br>
+                正解：${m.correct}
+            `;
+
+        });
+
+    }
+
+}
+
+
+hintBtn.onclick=()=>{
+
+const q=questions[current];
+
+hintBox.style.display="block";
+
+hintBox.textContent=q.hint;
+
+};
+
+startBtn.onclick=startGame;
+retryBtn.onclick=startGame;
+
+homeBtn.onclick=()=>{
+
+resultScreen.classList.remove("active");
+gameScreen.classList.remove("active");
+startScreen.classList.add("active");
+
+};
+
+</script>
+
+</body>
+</html>
