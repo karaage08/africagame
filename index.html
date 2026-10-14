@@ -81,6 +81,17 @@ font-weight:bold;
 background:#ff9800;
 }
 
+.bestRecord{
+font-size:1.1rem;
+font-weight:bold;
+color:#ff9500;
+margin-top:20px;
+line-height:1.8;
+padding:15px;
+background:#fff9e8;
+border-radius:12px;
+}
+
 .infoBar{
 display:flex;
 justify-content:center;
@@ -225,13 +236,6 @@ background:#999;
 color:white;
 }
 
-.bestRecord{
-font-size:1.3rem;
-font-weight:bold;
-color:#ff9500;
-margin-top:20px;
-}
-
 .submitGuide{
 margin-top:20px;
 padding:15px;
@@ -257,8 +261,6 @@ grid-template-columns:1fr;
 
 <body>
 
-<!-- タイトル画面 -->
-
 <div id="startScreen" class="screen active">
 
 <div class="card">
@@ -277,7 +279,6 @@ type="radio"
 name="mode"
 value="random"
 checked>
-
 🎲 ランダム10問チャレンジ
 </label>
 
@@ -286,16 +287,18 @@ checked>
 type="radio"
 name="mode"
 value="all">
-
 👑 全16問マスター
 </label>
 
 </div>
 
+<div id="titleBest" class="bestRecord">
+🏆 自己ベスト読込中...
+</div>
+
 <button
 id="startBtn"
 class="startBtn">
-
 スタート！
 </button>
 
@@ -339,7 +342,9 @@ class="questionText">
 </div>
 
 <div class="mapContainer">
-    <img src="africa_map.png" alt="アフリカ地図">
+<img
+src="africa_map.png"
+alt="アフリカ地図">
 </div>
 
 <div id="feedback" class="feedback"></div>
@@ -347,11 +352,16 @@ class="questionText">
 <div id="answers" class="answers">
 </div>
 
-<button id="hintBtn" class="hintBtn">
+<button
+id="hintBtn"
+class="hintBtn">
 💡 ヒント
 </button>
 
-<div id="hintBox" class="hint"></div>
+<div
+id="hintBox"
+class="hint">
+</div>
 
 </div>
 
@@ -407,14 +417,12 @@ class="mistakes">
 <button
 id="retryBtn"
 class="retryBtn">
-
 もう一回！
 </button>
 
 <button
 id="homeBtn"
 class="homeBtn">
-
 タイトルへ
 </button>
 
@@ -456,17 +464,32 @@ const quizData = [
 
 ];
 
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
-const resultScreen = document.getElementById("resultScreen");
+const startScreen =
+document.getElementById("startScreen");
 
-const startBtn = document.getElementById("startBtn");
-const retryBtn = document.getElementById("retryBtn");
-const homeBtn = document.getElementById("homeBtn");
+const gameScreen =
+document.getElementById("gameScreen");
 
-const progress = document.getElementById("progress");
-const questionText = document.getElementById("questionText");
-const answers = document.getElementById("answers");
+const resultScreen =
+document.getElementById("resultScreen");
+
+const startBtn =
+document.getElementById("startBtn");
+
+const retryBtn =
+document.getElementById("retryBtn");
+
+const homeBtn =
+document.getElementById("homeBtn");
+
+const progress =
+document.getElementById("progress");
+
+const questionText =
+document.getElementById("questionText");
+
+const answers =
+document.getElementById("answers");
 
 const correctCountEl =
 document.getElementById("correctCount");
@@ -490,150 +513,235 @@ let mistakes = [];
 let seconds = 0;
 let timer;
 
+function showTitleBest(){
+
+    const randomBest =
+        JSON.parse(
+            localStorage.getItem(
+                "africa_random_best"
+            )
+        );
+
+    const allBest =
+        JSON.parse(
+            localStorage.getItem(
+                "africa_all_best"
+            )
+        );
+
+    let html = "<h3>🏆 自己ベスト</h3>";
+
+    if(randomBest){
+
+        html += `
+        🎲 ランダム10問<br>
+        正答率 ${randomBest.rate}%<br>
+        ${randomBest.time}秒
+        <br><br>
+        `;
+
+    }else{
+
+        html += `
+        🎲 ランダム10問：未プレイ
+        <br><br>
+        `;
+
+    }
+
+    if(allBest){
+
+        html += `
+        👑 全問モード<br>
+        正答率 ${allBest.rate}%<br>
+        ${allBest.time}秒
+        `;
+
+    }else{
+
+        html += `
+        👑 全問モード：未プレイ
+        `;
+
+    }
+
+    document.getElementById(
+        "titleBest"
+    ).innerHTML = html;
+
+}
+
 function shuffle(array){
 
-return [...array].sort(
-()=>Math.random()-0.5
-);
+    return [...array].sort(
+        ()=>Math.random()-0.5
+    );
 
 }
 
 function startGame(){
 
-const mode =
-document.querySelector(
-'input[name="mode"]:checked'
-).value;
+    window.currentMode =
+    document.querySelector(
+        'input[name="mode"]:checked'
+    ).value;
 
-questions =
-mode==="random"
-? shuffle(quizData).slice(0,10)
-: shuffle(quizData);
+    const mode =
+    window.currentMode;
 
-current=0;
-correct=0;
-mistakes=[];
-seconds=0;
+    questions =
+    mode==="random"
+    ? shuffle(quizData).slice(0,10)
+    : shuffle(quizData);
 
-correctCountEl.textContent=0;
-timerEl.textContent=0;
+    current = 0;
+    correct = 0;
+    mistakes = [];
+    seconds = 0;
 
-clearInterval(timer);
+    correctCountEl.textContent = 0;
+    timerEl.textContent = 0;
 
-timer=setInterval(()=>{
+    clearInterval(timer);
 
-seconds++;
-timerEl.textContent=seconds;
+    timer = setInterval(()=>{
 
-},1000);
+        seconds++;
+        timerEl.textContent = seconds;
 
-startScreen.classList.remove("active");
-resultScreen.classList.remove("active");
-gameScreen.classList.add("active");
+    },1000);
 
-showQuestion();
+    startScreen.classList.remove(
+        "active"
+    );
+
+    resultScreen.classList.remove(
+        "active"
+    );
+
+    gameScreen.classList.add(
+        "active"
+    );
+
+    showQuestion();
 
 }
 
 function showQuestion(){
 
-const q=questions[current];
+    const q =
+    questions[current];
 
-progress.textContent=
-`${current+1}/${questions.length}`;
+    progress.textContent =
+    `${current+1}/${questions.length}`;
 
-questionText.textContent=
-`${q.id} は何でしょう？`;
+    questionText.textContent =
+    `${q.id} は何でしょう？`;
 
-hintBox.style.display="none";
-hintBox.textContent="";
+    hintBox.style.display =
+    "none";
 
-feedback.textContent="";
+    hintBox.textContent = "";
 
-const choices =
-shuffle(
-quizData
-.filter(
-x=>x.answer!==q.answer
-)
-)
-.slice(0,3);
+    feedback.textContent = "";
 
-choices.push(q);
+    const choices =
+    shuffle(
 
-const finalChoices =
-shuffle(choices);
+        quizData.filter(
+            x=>x.answer!==q.answer
+        )
 
-answers.innerHTML="";
+    ).slice(0,3);
 
-finalChoices.forEach(choice=>{
+    choices.push(q);
 
-const btn=
-document.createElement("button");
+    const finalChoices =
+    shuffle(choices);
 
-btn.className="answerBtn";
+    answers.innerHTML = "";
 
-btn.textContent=
-choice.answer;
+    finalChoices.forEach(choice=>{
 
-btn.onclick=()=>checkAnswer(choice);
+        const btn =
+        document.createElement(
+            "button"
+        );
 
-answers.appendChild(btn);
+        btn.className =
+        "answerBtn";
 
-});
+        btn.textContent =
+        choice.answer;
+
+        btn.onclick = ()=>{
+
+            checkAnswer(choice);
+
+        };
+
+        answers.appendChild(btn);
+
+    });
 
 }
 
 function checkAnswer(choice){
 
-const q=questions[current];
+    const q =
+    questions[current];
 
-if(choice.answer===q.answer){
+    if(
+        choice.answer === q.answer
+    ){
 
-feedback.className=
-"feedback correct";
+        feedback.className =
+        "feedback correct";
 
-feedback.textContent=
-`⭕ 正解! ${q.info}`;
+        feedback.textContent =
+        `⭕ 正解! ${q.info}`;
 
-correct++;
+        correct++;
 
-correctCountEl.textContent=
-correct;
+        correctCountEl.textContent =
+        correct;
 
-}else{
+    }else{
 
-feedback.className=
-"feedback wrong";
+        feedback.className =
+        "feedback wrong";
 
-feedback.textContent=
-`❌ 不正解… 正解：${q.answer}`;
+        feedback.textContent =
+        `❌ 不正解… 正解：${q.answer}`;
 
-mistakes.push({
+        mistakes.push({
 
-id:q.id,
-your:choice.answer,
-correct:q.answer
+            id:q.id,
+            your:choice.answer,
+            correct:q.answer
 
-});
+        });
 
-}
+    }
 
-setTimeout(()=>{
+    setTimeout(()=>{
 
-current++;
+        current++;
 
-if(current>=questions.length){
+        if(
+            current >=
+            questions.length
+        ){
 
-finishGame();
+            finishGame();
 
-}else{
+        }else{
 
-showQuestion();
+            showQuestion();
 
-}
+        }
 
-},1200);
+    },1200);
 
 }
 
@@ -641,93 +749,186 @@ function finishGame(){
 
     clearInterval(timer);
 
-    gameScreen.classList.remove("active");
-    resultScreen.classList.add("active");
-
-    document.getElementById("resultCorrect").textContent = correct;
-
-    document.getElementById("resultMiss").textContent =
-        questions.length - correct;
-
-    document.getElementById("resultTime").textContent =
-        seconds;
-
-    const rate = Math.round(
-        correct / questions.length * 100
+    gameScreen.classList.remove(
+        "active"
     );
 
-    document.getElementById("resultRate").textContent =
-        rate;
+    resultScreen.classList.add(
+        "active"
+    );
+
+    document.getElementById(
+        "resultCorrect"
+    ).textContent = correct;
+
+    document.getElementById(
+        "resultMiss"
+    ).textContent =
+    questions.length - correct;
+
+    document.getElementById(
+        "resultTime"
+    ).textContent = seconds;
+
+    const rate =
+    Math.round(
+        correct /
+        questions.length *
+        100
+    );
+
+    document.getElementById(
+        "resultRate"
+    ).textContent = rate;
 
     let rank = "";
 
     if(rate === 100){
-        rank = "🏆 Sランク";
+
+        rank =
+        "🏆 Sランク";
+
     }else if(rate >= 90){
-        rank = "🥇 Aランク";
+
+        rank =
+        "🥇 Aランク";
+
     }else if(rate >= 80){
-        rank = "🥈 Bランク";
+
+        rank =
+        "🥈 Bランク";
+
     }else if(rate >= 70){
-        rank = "🥉 Cランク";
+
+        rank =
+        "🥉 Cランク";
+
     }else{
-        rank = "⭐ がんばろう";
+
+        rank =
+        "⭐ がんばろう";
+
     }
 
-    document.getElementById("rankBox").innerHTML = rank;
+    document.getElementById(
+        "rankBox"
+    ).innerHTML = rank;
 
-    console.log(rank);
+    /* ---------- 自己ベスト ---------- */
 
-    // 自己ベスト記録
     let bestHtml = "";
 
-    if(correct === questions.length){
+    const saveKey =
+    window.currentMode === "random"
+    ? "africa_random_best"
+    : "africa_all_best";
 
-        const best =
-            localStorage.getItem("africa_best");
+    const currentRecord = {
 
-        if(best === null || seconds < Number(best)){
+        rate: rate,
+        time: seconds
 
-            localStorage.setItem(
-                "africa_best",
-                seconds
-            );
+    };
 
-            bestHtml =
-                `🏆 NEW RECORD!<br>自己ベスト：${seconds}秒`;
+    const bestRecord =
+    JSON.parse(
+        localStorage.getItem(
+            saveKey
+        )
+    );
 
-        }else{
+    let isNewRecord = false;
 
-            bestHtml =
-                `⭐ 自己ベスト：${best}秒`;
+    if(
 
-        }
+        !bestRecord ||
+
+        rate > bestRecord.rate ||
+
+        (
+            rate === bestRecord.rate &&
+            seconds < bestRecord.time
+        )
+
+    ){
+
+        localStorage.setItem(
+
+            saveKey,
+
+            JSON.stringify(
+                currentRecord
+            )
+
+        );
+
+        isNewRecord = true;
+
+    }
+
+    const latest =
+    JSON.parse(
+        localStorage.getItem(
+            saveKey
+        )
+    );
+
+    if(isNewRecord){
+
+        bestHtml = `
+        🏆 NEW RECORD!
+        <br>
+        正答率 ${latest.rate}%
+        <br>
+        ${latest.time}秒
+        `;
+
+    }else{
+
+        bestHtml = `
+        ⭐ BEST
+        <br>
+        正答率 ${latest.rate}%
+        <br>
+        ${latest.time}秒
+        `;
+
     }
 
     document.getElementById(
         "bestRecord"
     ).innerHTML = bestHtml;
 
-    // 間違い一覧
-    const missArea =
-        document.getElementById("mistakes");
+    showTitleBest();
 
-    if(mistakes.length === 0){
+    /* ---------- ミス一覧 ---------- */
+
+    const missArea =
+    document.getElementById(
+        "mistakes"
+    );
+
+    if(
+        mistakes.length === 0
+    ){
 
         missArea.innerHTML =
-            "<b>🎉 全問正解！</b>";
+        "<b>🎉 全問正解！</b>";
 
     }else{
 
         missArea.innerHTML =
-            "<h3>間違えた問題</h3>";
+        "<h3>間違えた問題</h3>";
 
-        mistakes.forEach(m => {
+        mistakes.forEach(m=>{
 
-            missArea.innerHTML += `
-                <hr>
-                <b>${m.id}</b><br>
-                あなた：${m.your}<br>
-                正解：${m.correct}
+            missArea.innerHTML +=
+
+            `
+            <hr>
+            <b>${m.id}</b><br>
+            あなた：${m.your}<br>
+            正解：${m.correct}
             `;
 
         });
@@ -736,27 +937,44 @@ function finishGame(){
 
 }
 
+hintBtn.onclick = ()=>{
 
-hintBtn.onclick=()=>{
+    const q =
+    questions[current];
 
-const q=questions[current];
+    hintBox.style.display =
+    "block";
 
-hintBox.style.display="block";
+    hintBox.textContent =
+    q.hint;
 
-hintBox.textContent=q.hint;
+};
+
+startBtn.onclick =
+startGame;
+
+retryBtn.onclick =
+startGame;
+
+homeBtn.onclick = ()=>{
+
+    showTitleBest();
+
+    resultScreen.classList.remove(
+        "active"
+    );
+
+    gameScreen.classList.remove(
+        "active"
+    );
+
+    startScreen.classList.add(
+        "active"
+    );
 
 };
 
-startBtn.onclick=startGame;
-retryBtn.onclick=startGame;
-
-homeBtn.onclick=()=>{
-
-resultScreen.classList.remove("active");
-gameScreen.classList.remove("active");
-startScreen.classList.add("active");
-
-};
+showTitleBest();
 
 </script>
 
